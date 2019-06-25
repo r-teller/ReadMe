@@ -62,7 +62,7 @@ EOF
 
 ## Sign Server Certificate Request with CA with custom start and end date
 ```bash
-openssl ca -policy 'my_policy' -out cogswellcogs_20200625.crt -extensions 'req_ext' -name 'my_ca' -config <(
+openssl ca -policy 'my_policy' -out cogswellcogs.crt -extensions 'req_ext' -name 'my_ca' -config <(
 cat <<-EOF
     [ req_ext ]
     subjectAltName = @alt_names
@@ -114,4 +114,8 @@ cat <<-EOF
     commonName = supplied
 EOF
 ) -startdate 20190625120000Z -enddate 20200625120000Z -batch -infiles cogswellcogs.csr
+```
+## Convert PEM to PKCS12
+```bash
+openssl pkcs12 -export -out cogswellcogs.pfx -inkey cogswellcogs.key -in cogswellcogs.crt -certfile CACert.crt
 ```
