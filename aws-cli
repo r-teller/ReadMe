@@ -1,0 +1,2 @@
+# Searching for AMI by Name
+aws ec2 describe-images --region us-west-1 --filters Name=tag:Name,Values=F5*
