@@ -122,12 +122,12 @@ commonName                      = Common Name
 emailAddress                    = Email Address
 
 # Optionally, specify some defaults.
-countryName_default             = GB
-stateOrProvinceName_default     = England
-localityName_default            =
-0.organizationName_default      = Alice Ltd
+countryName_default             = US
+stateOrProvinceName_default     = Washington
+localityName_default            = Seattle
+0.organizationName_default      = Acme Financial
 organizationalUnitName_default  =
-emailAddress_default            =
+emailAddress_default            = no-reply@acmefinancial.net
 
 [ v3_ca ]
 # Extensions for a typical CA ('man x509v3_config').
@@ -162,6 +162,8 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
+default_days      = 730
+
 
 [ crl_ext ]
 # Extension for CRLs ('man x509v3_config').
