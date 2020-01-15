@@ -45,7 +45,7 @@ default_md        = sha256
 
 name_opt          = ca_default
 cert_opt          = ca_default
-default_days      = 375
+default_days      = 3650
 preserve          = no
 policy            = policy_strict
 
@@ -74,7 +74,7 @@ default_md        = sha256
 
 name_opt          = ca_default
 cert_opt          = ca_default
-default_days      = 375
+default_days      = 1825
 preserve          = no
 policy            = policy_strict
 
