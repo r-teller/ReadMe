@@ -110,21 +110,24 @@ The following Linux utilities are required by the installation script. The scrip
     base64, basename, cat, dirname, head, id, mkdir, numfmt, sort, tee
 
 
-### Installing NGINX-Controller on CentOs 7
+### Installing NGINX-Controller prerequisite on CentOs 7
 #### Installing JQ
 ```bash
 # Install Extra Packages for Enterprise Linux
 sudo yum install epel-release -y
 
-# Install JQ
-sudo yum install -y jq
+# Install jq
+sudo yum install jq -y
+
+# Install wget
+sudo yum install wget -y
 ```
 
-### Installing NGINX-Controller on Ubuntu 1804
+### Installing NGINX-Controller prerequisite on Ubuntu 1804
 #### Installing JQ
 ```bash
-# Install JQ
-sudo apt-get install jq -y
+# Install jq
+sudo yum install jq -y
 ```
 
 ## NGINX-Controller install steps
@@ -168,4 +171,36 @@ smtpIP='127.0.0.1'
     --admin-firstname admin \
     --admin-lastname istrator \
     --tsdb-volume-type local
+```
+
+# NGINX Plus Setup
+## NGINX Plus prerequisite steps by OS
+### NGINX Plus prerequisite on CentOs 7
+Issues have been observed with selinux preventing NGINX-Controller agent from making changes to the local file system
+```bash
+# Install selinux tools
+sudo yum install setools-console -y
+
+# Create nginx.te file that will be used for configuring selinux
+cat << EOF > ./nginx.te
+module nginx 1.0;
+
+require {
+        type httpd_t;
+        type httpd_config_t;
+        class file append;
+}
+
+#============= httpd_t ==============
+allow httpd_t httpd_config_t:file append;
+EOF
+
+# Convert te file into module
+checkmodule -M -m -o ./nginx.mod ./nginx.te
+
+# Compile se module
+semodule_package -o ./nginx.pp -m ./nginx.mod
+
+# Import selinux policy
+semodule -i ./nginx.pp
 ```
