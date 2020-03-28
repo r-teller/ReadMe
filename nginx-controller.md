@@ -178,8 +178,11 @@ smtpIP='127.0.0.1'
 ### NGINX Plus prerequisite on CentOs 7
 Issues have been observed with selinux preventing NGINX-Controller agent from making changes to the local file system
 ```bash
+# Execute the following commands as a privilleged user
+sudo -s
+
 # Install selinux tools
-sudo yum install setools-console -y
+yum install setools-console -y
 
 # Create nginx.te file that will be used for configuring selinux
 cat << EOF > ./nginx.te
@@ -203,4 +206,6 @@ semodule_package -o ./nginx.pp -m ./nginx.mod
 
 # Import selinux policy
 semodule -i ./nginx.pp
+
+exit
 ```
