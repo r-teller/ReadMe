@@ -1,6 +1,0 @@
-# Searching for AMI by Name
-aws ec2 describe-images --region us-west-1 --filters Name=tag:Name,Values=F5*
-
-# Expand volume size
-sudo growpart /dev/nvme0n1 1
-sudo resize2fs /dev/nvme0n1p1 
