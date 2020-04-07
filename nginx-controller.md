@@ -85,19 +85,18 @@ sudo -i  -u postgres
 
 # Launch postgresql client
 psql
+```
 
-# Create service account that nginx-controller will use
-## It is suggested that you change the password to something more secure/unique
+```sql
+-- Create service account that nginx-controller will use
+---- It is suggested that you change the password to something more secure/unique
 CREATE USER naas WITH PASSWORD 'K33p0ut';
 
-# Grant the user permissions to create databases
+-- Grant the user permissions to create databases
 ALTER USER naas CREATEDB;
 
-# Exit postgresql client
+-- Exit postgresql client
 \q
-
-# Exit privilleged user
-exit
 ```
 
 # NGINX-Controller Host Setup
