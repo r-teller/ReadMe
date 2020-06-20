@@ -184,8 +184,8 @@ sudo -s
 yum install setools-console -y
 
 # Create nginx.te file that will be used for configuring selinux
-cat << EOF > ./nginx.te
-module nginx 1.0;
+cat << EOF > ./nginx-plus-module-f5-metrics.te
+module nginx-plus-module-f5-metrics 1.0;
 
 require {
         type httpd_t;
@@ -198,13 +198,13 @@ allow httpd_t httpd_config_t:file append;
 EOF
 
 # Convert te file into module
-checkmodule -M -m -o ./nginx.mod ./nginx.te
+checkmodule -M -m -o ./nginx-plus-module-f5-metrics.mod ./nginx-plus-module-f5-metrics.te
 
 # Compile se module
-semodule_package -o ./nginx.pp -m ./nginx.mod
+semodule_package -o ./nginx-plus-module-f5-metrics.pp -m ./nginx-plus-module-f5-metrics.mod
 
 # Import selinux policy
-semodule -i ./nginx.pp
+semodule -i ./nginx-plus-module-f5-metrics.pp
 
 exit
 ```
