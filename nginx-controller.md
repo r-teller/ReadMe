@@ -55,7 +55,7 @@ wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key a
 apt-get update
 
 # Install additional PostgreSQL modules
-yum install postgresql-contrib -y
+apt-get install postgresql-contrib -y
 
 # Install PostgreSQL Server
 apt-get install postgresql-9.5 -y
