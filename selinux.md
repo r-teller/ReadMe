@@ -24,5 +24,8 @@ semodule_package -o ./nginx.pp -m ./nginx.mod
 # Import selinux policy
 semodule -i ./nginx.pp
 
-## Repeat until service works
+# Repeat until service works
+
+# re-enable noaudit flag
+semodule -B
 ```
