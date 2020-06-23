@@ -208,3 +208,194 @@ semodule -i ./nginx-plus-module-f5-metrics.pp
 
 exit
 ```
+# NGINX-Controller Managed Instances
+## NGINX-Controller-Agent Prerequisite check
+```bash
+#!/bin/bash
+
+# Get OS information
+get_os_name() {
+
+    centos_flavor="centos"
+
+    # Use lsb_release if possible
+    if command -V lsb_release >/dev/null 2>&1; then
+        os=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+        codename=$(lsb_release -cs | tr '[:upper:]' '[:lower:]')
+        release=$(lsb_release -rs | sed 's/\..*$//')
+
+        if [ "$os" = "redhatenterpriseserver" ] || [ "$os" = "oracleserver" ]; then
+            os="centos"
+            centos_flavor="red hat linux"
+        fi
+    # Otherwise it's getting a little bit more tricky
+    else
+        if ! ls /etc/*-release >/dev/null 2>&1; then
+            os=$(uname -s |
+                tr '[:upper:]' '[:lower:]')
+        else
+            os=$(cat /etc/*-release | grep '^ID=' |
+                sed 's/^ID=["]*\([a-zA-Z]*\).*$/\1/' |
+                tr '[:upper:]' '[:lower:]')
+
+            if [ -z "$os" ]; then
+                if grep -i "oracle linux" /etc/*-release >/dev/null 2>&1 ||
+                    grep -i "red hat" /etc/*-release >/dev/null 2>&1; then
+                    os="rhel"
+                else
+                    if grep -i "centos" /etc/*-release >/dev/null 2>&1; then
+                        os="centos"
+                    else
+                        os="linux"
+                    fi
+                fi
+            fi
+        fi
+    fi
+    
+    case "$os" in
+        ubuntu | debian | centos | rhel | ol | amzn)
+            echo "[INFO] $os is supported"
+            ;;
+        *)
+            echo "[ERROR] Unknown OS"
+            exit 2
+    esac
+}
+
+
+# Check if package is installed
+function package_check() {
+    case "$os" in
+        ubuntu | debian)
+            DPKG_RESULTS=$(dpkg-query -W --showformat='${Version}\n' $PKG_NAME 2>/dev/null)
+            if [ "" = "$DPKG_RESULTS" ]; then
+                echo "[ERROR] $PKG_NAME is not installed"
+                PKG_VERSION="NOT-INSTALLED"
+            else
+                echo "[OKAY] $PKG_NAME is installed"
+                PKG_VERSION=$DPKG_RESULTS
+            fi
+            ;;
+        amzn | centos | rhel | ol)
+            RPM_RESULTS=$(rpm -q --queryformat "%{VERSION}\n" $PKG_NAME)
+            if [[ $RPM_RESULTS == *'not installed' ]]; then
+                echo "[ERROR] $PKG_NAME is not installed"
+                PKG_VERSION="NOT-INSTALLED"
+            else
+                echo "[OKAY] $PKG_NAME is installed"
+                PKG_VERSION=$RPM_RESULTS
+            fi
+            ;;
+    esac
+}
+
+# Check OS
+get_os_name
+
+## Check NGINX-Plus is installed
+PKG_NAME=nginx-plus
+package_check
+
+## Check NGINX-Plus version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        19*)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+        20*)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+        21*)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+        22*)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+        *)
+            echo "[ERROR] $PKG_NAME version is not supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi 
+
+
+## Check libxerces is installed
+PKG_NAME=libxerces-c3.2
+package_check
+
+## Check libxerces version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        *)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi
+
+## Check Python2.7 is installed
+PKG_NAME=python2.7
+package_check
+
+## Check libxerces version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        *)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi
+
+# Commented out until 3.7 released
+# Check GoLang is installed
+# PKG_NAME=golang-go
+# package_check
+
+# Check libxerces version
+# if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    # case "$PKG_VERSION" in
+        # *)
+            # echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            # ;;
+    # esac
+# fi
+
+
+## Check OpenSSL is installed
+PKG_NAME=openssl
+package_check
+
+## Check libxerces version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        *)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi
+
+## Check Curl is installed
+PKG_NAME=curl
+package_check
+
+## Check libxerces version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        *)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi
+
+## Check Curl is installed
+PKG_NAME=cloud-init
+package_check
+
+## Check libxerces version
+if [ "$PKG_VERSION" != "NOT-INSTALLED" ]; then 
+    case "$PKG_VERSION" in
+        *)
+            echo "[OKAY] $PKG_NAME version is supported --> ${PKG_VERSION}"
+            ;;
+    esac
+fi
+```
