@@ -72,7 +72,7 @@ allow httpd_t shadow_t:file { read write open getattr };
 allow httpd_t systemd_logind_sessions_t:fifo_file write;
 allow httpd_t systemd_logind_t:dbus send_msg;
 
-allow httpd_t var_log_t:file { open read };
+allow httpd_t var_log_t:file { open read write };
 allow httpd_t var_run_t:file { read write };
 
 #============= systemd_logind_t ==============
