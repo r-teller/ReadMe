@@ -190,11 +190,15 @@ module nginx-plus-module-f5-metrics 1.0;
 require {
         type httpd_t;
         type httpd_config_t;
+        type tmp_t;
+
         class file append;
+        class sock_file write;
 }
 
 #============= httpd_t ==============
 allow httpd_t httpd_config_t:file append;
+allow httpd_t tmp_t:sock_file write;
 EOF
 
 # Convert te file into module
