@@ -1,6 +1,6 @@
 ## Create Cert and Key in single command
 ```bash
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+openssl req -nodes -new -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 ```
 
 ## Create openssl.cnf and setup root/intermediate directory
