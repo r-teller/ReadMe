@@ -17,8 +17,6 @@ when HTTP_REQUEST {
             HTTP::collect $content_length
         }
     }
-
-
     
     node 127.0.0.1 8443
 }
