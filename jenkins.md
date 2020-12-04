@@ -18,6 +18,5 @@ docker exec -it --user root k8s_jenkins-master_jenkins-dev /bin/bash
 
 import the ca certificate
 ```bash
-keytool -no-prompt -import --keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -alias neustar-ca -file /var/jenkins_home
-/trusted_ca.crt -storepass changeit
+keytool -no-prompt -import --keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -alias trusted-ca -file /var/jenkins_home/trusted_ca.crt -storepass changeit
 ```
