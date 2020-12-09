@@ -7,16 +7,19 @@ Some services establish vpc peering between Google managed infrastructure and yo
     - GKE Private Clusters (https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept)
     - Private Services access for Cloud SQL (https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access)
     - Private IP Cloud Composer (https://cloud.google.com/composer/docs/how-to/managing/configuring-private-ip)
-
+<img src="./images/vpc-simple-design.png"  width="25%" height="25%" />
 
 Only directly peered networks can communicate. Transitive peering is not supported. In other words, if VPC network N1 is peered with N2 and N3, but N2 and N3 are not directly connected, VPC network N2 cannot communicate with VPC network N3 over VPC Network Peering.
 - https://cloud.google.com/vpc/docs/vpc-peering#restrictions
 
-![alt text](./images/vpc-transitive-issue.png =250x250)
+## Example Scenario
+ihaz.cloud has two projects (alpha & bravo). The alpha project has a custom VPC that hosts a GKE private cluster and is peered with both the google managed vpc (hosts GKE Master nodes) and the bravo vpc. 
+
+<img src="./images/vpc-transitive-issue.png"  width="25%" height="25%" />
 
 # Workarounds
 ## Cloud VPN
-The issue with transitive peering is the lack of learned route exchanges between peers. While GCP does support static routes it does not allow you to specify a VPC as the next hop. To workaround this we can leverage Cloud VPNs between the source VPC and VPC peered with the GCP Resource (GKE/Cloud-SQL/Cloud Composer) and then using Cloud Router we can inject only the routes needed
+The issue with transitive peering is the lack of routes exchangeed between peers. While GCP does support static routes it does not allow you to specify a VPC peer as the next hop. To workaround this we can leverage Cloud VPNs between the source VPC and destination VPC that is peered with the GCP Resource (GKE/Cloud-SQL/Cloud Composer) and then using Cloud Router we can inject the specific routes needed.
 
 ## Proxies
 ### Connecting to Cloud SQL using the docker image
