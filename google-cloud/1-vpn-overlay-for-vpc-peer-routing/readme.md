@@ -259,3 +259,26 @@ gke-cluster-1-default-pool-4f6718c9-h8pj   Ready    <none>   58m   v1.16.15-gke.
 gke-cluster-1-default-pool-4f6718c9-kjm2   Ready    <none>   58m   v1.16.15-gke.4300   192.168.0.2                 Container-Optimized OS from Google   4.19.112+        docker://19.3.1
 gke-cluster-1-default-pool-4f6718c9-s20b   Ready    <none>   58m   v1.16.15-gke.4300   192.168.0.3                 Container-Optimized OS from Google   4.19.112+        docker://19.3.1
 ```
+
+## What does this look like in a larger enterprise deployment
+We can easily expand this design to support a hub and spoke model, where Interconnects and/or Cloud VPNs terminate into a dedicated VPC and then peer with additional VPCs within GCP to provide them network connectivity to on-premises.
+
+In this example scenario our organization `ihaz.cloud` has three projects (alpha, bravo & charlie). 
+1. The alpha project has a VPC with a GKE private cluster deployed (without an external ip assigned to the master)
+    - It is peered with both the google managed vpc (hosts GKE Master nodes) and the bravo vpc.
+2. The bravo project has a VPC with a dedicated interconnect back to our corporate office, this VPC will act as our hub within our hub and spoke model design. 
+    - It has a VPN connection to the alpha project to exchange routes for connectivity to the GKE Master node.
+    - It is peered with both the alpha and bravo vpc
+3. The charlie project has a VPC that will be used for development purposes and has a handful of VMs running with terraform and kubectl installed. This VPC is where `ihaz.cloud` admins will administer GKE from
+    - It is peered with the bravo vpc
+    - *Note: Since it is not peered with the alpha VPC users will not be able to interact with the GKE Worker Nodes. This is because the routing vpc routing is not transitive and only the GKE Master node subnet is being advertised over the VPN*
+
+<img src="./images/vpc-hub-design.png"  width="50%" height="50%" />
+
+## Why mix VPC peering and VPNs
+Since VPC routing is not transitive why would you mix VPC peering and VPNs instead of just using VPNs for vpc interconnectivity
+- If there isn't a need to communicate to a private cluster, vpc to vpc communication over a vpc peer is much easier to setup and maintain
+- Each VPN tunnel is limited to 3 Gbps, and while you can bond them together any VM to VM communication would be limited to 3 Gbps whereas communication over a VPC peered link could reach 100 Gbps depending on the instance size
+  - https://cloud.google.com/network-connectivity/docs/vpn/quotas#limits
+- VPN gateways are regional resources. If VPN gateways are in the same GCP region, egress traffic is billed as traffic between zones in the same region. If you were communicating to a vm in a peer VPC but the same zone as the source VM there would be no additional cost but if you were going through a VPN there is additional cost for the zonal routing
+  - https://cloud.google.com/vpc/network-pricing#vpn-pricing
