@@ -1,8 +1,8 @@
 # Challenge
-Not able to connect to private clusters to manage services such as GKE or Cloud-SQL from a remote VPC or On-Premises. 
+Users are not able to connect to private clusters and manage services such as GKE or Cloud-SQL from a when traversing through peer VPC and the service does not have an exposed public address.
 
 # Root Cause
-Some services establish vpc peering between Google managed infrastructure and your VPC
+Some services establish vpc peering between Google managed infrastructure and your VPC when they are deployed
 - Services that establish a VPC Peer
     - GKE Private Clusters (https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept)
     - Private Services access for Cloud SQL (https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access)
@@ -14,7 +14,7 @@ Only directly peered networks can communicate. Transitive peering is not support
 - https://cloud.google.com/vpc/docs/vpc-peering#restrictions
 
 ## Example Scenario
-ihaz.cloud has two projects (alpha & bravo). The alpha project has a VPC with a GKE private cluster deployed (without an external ip assigned to the master) and is peered with both the google managed vpc (hosts GKE Master nodes) and the bravo vpc. 
+Our example organization `ihaz.cloud` has two projects (alpha & bravo). The alpha project has a VPC with a GKE private cluster deployed (without an external ip assigned to the master) and is peered with both the google managed vpc (hosts GKE Master nodes) and the bravo vpc. 
 
 *Note: Since this is a private cluster and it does NOT have a public endpoint*
 
@@ -259,4 +259,3 @@ gke-cluster-1-default-pool-4f6718c9-h8pj   Ready    <none>   58m   v1.16.15-gke.
 gke-cluster-1-default-pool-4f6718c9-kjm2   Ready    <none>   58m   v1.16.15-gke.4300   192.168.0.2                 Container-Optimized OS from Google   4.19.112+        docker://19.3.1
 gke-cluster-1-default-pool-4f6718c9-s20b   Ready    <none>   58m   v1.16.15-gke.4300   192.168.0.3                 Container-Optimized OS from Google   4.19.112+        docker://19.3.1
 ```
-
