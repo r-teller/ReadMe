@@ -2,7 +2,7 @@
 " wvh's .vimrc
 " --------------------------
 "
-so ~/.exrc
+
 "
 " Variable Settings
 "
@@ -21,7 +21,7 @@ set smarttab
 set spell
 "
 " I don't like syntax highlighting
-syntax off
+"" syntax off
 "
 " Always display row/column info 
 set ruler
@@ -47,10 +47,10 @@ set backup
 set encoding=utf-8
 "
 " Try to set right locale
-try
-    lang en_US
-catch
-endtry
+"" try
+""    lang en_US
+"" catch
+"" endtry
 "
 " Allow backspacing over everything in insert mode.
 set backspace=indent,eol,start
@@ -107,25 +107,25 @@ map <C-X><C-W> :w<CR>
 " Example from developerWorks:
 "   http://www.ibm.com/developerworks/linux/library/l-vim-script-1
 "
-function! ToggleSyntax()
-   if exists("g:syntax_on")
-      syntax off
-   else
-      syntax enable
-   endif
-endfunction
+"" function! ToggleSyntax()
+""    if exists("g:syntax_on")
+""       syntax off
+""    else
+""       syntax enable
+""    endif
+"" endfunction
 "
 " Toggle syntax setting on/off
 map <F4> :execute ToggleSyntax()<CR>
 "
 " Similar function for when syntax isn't relevant
-function! ToggleColor()
-   if &t_Co != 0
-      set t_Co=0
-   else  
-      set t_Co=8
-   endif
-endfunction
+"" function! ToggleColor()
+""    if &t_Co != 0
+""       set t_Co=0
+""    else  
+""       set t_Co=8
+""    endif
+"" endfunction
 "
 " Toggle color on/off
 map <F6> :execute ToggleColor()<CR>

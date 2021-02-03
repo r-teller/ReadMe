@@ -7,6 +7,7 @@ Some services establish vpc peering between Google managed infrastructure and yo
     - GKE Private Clusters (https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept)
     - Private Services access for Cloud SQL (https://cloud.google.com/sql/docs/mysql/configure-private-services-access#configure-access)
     - Private IP Cloud Composer (https://cloud.google.com/composer/docs/how-to/managing/configuring-private-ip)
+    - VMware Engine Private Service Access (https://cloud.google.com/vmware-engine/docs/networking/howto-setup-private-service-access)
 
 <img src="./images/vpc-simple-design.png"  width="50%" height="50%" />
 
@@ -88,6 +89,7 @@ peering-route-4930277a10389873  ihaz-cloud-vpc-bravo       192.168.0.0/24   brav
 ```
 
 # Workarounds
+
 ## Cloud VPN
 The issue with transitive peering is caused by the lack of routes exchangeed between peers. While GCP does support static routes it does not allow you to specify a VPC peer as the next hop. To workaround this we can leverage Cloud VPNs between the source VPC and destination VPC that is peered with the GCP Resource (GKE/Cloud-SQL/Cloud Composer). 
 
@@ -140,7 +142,7 @@ result:
   network: https://www.googleapis.com/compute/v1/projects/ihaz-cloud-project-alpha/global/networks/ihaz-cloud-vpc-alpha
 ```
 
-The `Cloud Crouter` within ihaz-cloud-project-alpha will need to be updated to advertise a custom route for `192.168.255.0/28` since it is not being advertised. 
+The `Cloud Router` within ihaz-cloud-project-alpha will need to be updated to advertise a custom route for `192.168.255.0/28` since it is not being advertised. 
 
 ```bash
 ## Output from Cloud Router status shows that the subnet used by the GKE Master node is not being advertised
@@ -260,12 +262,19 @@ gke-cluster-1-default-pool-4f6718c9-kjm2   Ready    <none>   58m   v1.16.15-gke.
 gke-cluster-1-default-pool-4f6718c9-s20b   Ready    <none>   58m   v1.16.15-gke.4300   192.168.0.3                 Container-Optimized OS from Google   4.19.112+        docker://19.3.1
 ```
 
-## What does this look like in a larger enterprise deployment
+## Application Proxies
+### GKE
+https://cloud.google.com/solutions/creating-kubernetes-engine-private-clusters-with-net-proxies
+### Cloud-SQL
+https://cloud.google.com/sql/docs/mysql/connect-admin-proxy#docker-proxy-image_1
+
+# What does this look like in a larger enterprise deployment
 We can easily expand this design to support a hub and spoke model, where Interconnects and/or Cloud VPNs terminate into a dedicated VPC and then peer with additional VPCs within GCP to provide them network connectivity to on-premises.
 
 In this example scenario our organization `ihaz.cloud` has three projects (alpha, bravo & charlie). 
 1. The alpha project has a VPC with a GKE private cluster deployed (without an external ip assigned to the master)
-    - It is peered with both the google managed vpc (hosts GKE Master nodes) and the bravo vpc.
+    - It is peered with the google managed vpc (hosts GKE Master nodes)
+    - It is peered with the bravo vpc.
 2. The bravo project has a VPC with a dedicated interconnect back to our corporate office, this VPC will act as our hub within our hub and spoke model design. 
     - It has a VPN connection to the alpha project to exchange routes for connectivity to the GKE Master node.
     - It is peered with both the alpha and bravo vpc
