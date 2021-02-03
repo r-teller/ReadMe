@@ -263,6 +263,7 @@ gke-cluster-1-default-pool-4f6718c9-s20b   Ready    <none>   58m   v1.16.15-gke.
 ```
 
 ## Application Proxies
+It is possible to workaround the transitive routing issue using either an L4 or L7 proxy, included below are two solution specific examples
 ### GKE
 https://cloud.google.com/solutions/creating-kubernetes-engine-private-clusters-with-net-proxies
 ### Cloud-SQL
