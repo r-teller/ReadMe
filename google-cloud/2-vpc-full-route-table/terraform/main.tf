@@ -1,12 +1,9 @@
 locals {
-    project_id  = "i-haz-cloud"
-    vpc_name    = "i-haz-cloud-vpc"
-    region      = "us-central1"
-    vpc_filter  = urlencode("network=\"https://www.googleapis.com/compute/v1/projects/${local.project_id}/global/networks/${local.vpc_name}\"")
+    vpc_filter  = urlencode("network=\"https://www.googleapis.com/compute/v1/projects/${var.project_id}/global/networks/${var.vpc_name}\"")
 }
 
 data "google_project" "service_project" {
-    project_id = local.project_id
+    project_id = var.project_id
 }
 
 data "google_client_config" "clent_config" {
@@ -14,7 +11,7 @@ data "google_client_config" "clent_config" {
 
 # ## Get VPC Information
 data "http" "http_vpc_networks" {
-  url   = "https://compute.googleapis.com/compute/v1/projects/${local.project_id}/global/networks/${local.vpc_name}"
+  url   = "https://compute.googleapis.com/compute/v1/projects/${var.project_id}/global/networks/${var.vpc_name}"
   request_headers = {
     accept          =  "application/json"
     authorization   = "Bearer ${data.google_client_config.clent_config.access_token}"
@@ -34,7 +31,7 @@ locals {
 
 data "http" "http_vpc_peer_routes" {
     for_each   = {for vpc_peer in local.vpc_peerings: vpc_peer.name => vpc_peer }
-    url = "https://compute.googleapis.com/compute/v1/projects/${local.project_id}/global/networks/${local.vpc_name}/listPeeringRoutes?region=${local.region}&direction=INCOMING&peeringName=${each.value.name}"
+    url = "https://compute.googleapis.com/compute/v1/projects/${var.project_id}/global/networks/${var.vpc_name}/listPeeringRoutes?region=${var.region}&direction=INCOMING&peeringName=${each.value.name}"
     request_headers = {
         accept          =  "application/json"
         authorization   = "Bearer ${data.google_client_config.clent_config.access_token}"
@@ -50,7 +47,7 @@ locals {
     vpc_imported_routes = flatten([
         for route in local.vpc_peer_imported_routes:[
             for item in route.items:{
-                network = local.vpc_name
+                network = var.vpc_name
                 destRange   = item.destRange
                 priority    = item.priority
                 nextHopType = "Peer"
@@ -63,7 +60,7 @@ locals {
 }
 
 data "http" "http_vpc_routes" {
-    url = "https://compute.googleapis.com/compute/v1/projects/${local.project_id}/global/routes?filter=(${local.vpc_filter})&region=us-central1"
+    url = "https://compute.googleapis.com/compute/v1/projects/${var.project_id}/global/routes?filter=(${local.vpc_filter})&region=${var.region}"
     request_headers = {
         accept          =  "application/json"
         authorization   = "Bearer ${data.google_client_config.clent_config.access_token}"
@@ -72,7 +69,7 @@ data "http" "http_vpc_routes" {
 
 locals {
     vpc_native_routes = [for route in jsondecode(data.http.http_vpc_routes.body).items:{
-        network = local.vpc_name
+        network = var.vpc_name
         destRange = route.destRange
         priority = route.priority
         nextHopType = contains(keys(route),"nextHopNetwork") ? "Local" : contains(keys(route),"nextHopPeering") ? "Peer" : "Default"
@@ -84,7 +81,7 @@ locals {
 
 ## Build a list of all routers created within the specified VPC
 data "http" "http_vpc_routers" {
-    url = "https://compute.googleapis.com/compute/v1/projects/${local.project_id}/regions/us-central1/routers?filter=(${local.vpc_filter})"
+    url = "https://compute.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region}/routers?filter=(${local.vpc_filter})"
     request_headers = {
         accept          =  "application/json"
         authorization   = "Bearer ${data.google_client_config.clent_config.access_token}"
@@ -94,7 +91,7 @@ data "http" "http_vpc_routers" {
 ## Get the status of all routers created within the specified VPC
 data "http" "http_vpc_router_status" {
     for_each = toset(jsondecode(data.http.http_vpc_routers.body).items[*].name)
-    url = "https://compute.googleapis.com/compute/v1/projects/${local.project_id}/regions/us-central1/routers/${each.key}/getRouterStatus"
+    url = "https://compute.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region}/routers/${each.key}/getRouterStatus"
     request_headers = {
         accept          =  "application/json"
         authorization   = "Bearer ${data.google_client_config.clent_config.access_token}"
@@ -109,7 +106,7 @@ locals {
     ])
     vpc_bgp_routes = [
         for route in local.vpc_bgp_learned_routes:{
-            network     = local.vpc_name
+            network     = var.vpc_name
             destRange   = route.destRange
             priority    = route.priority
             nextHopType = "BGP"
