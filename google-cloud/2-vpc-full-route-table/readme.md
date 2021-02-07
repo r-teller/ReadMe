@@ -26,7 +26,7 @@ gcloud compute routers get-status --project my-project-name --region us-central1
 
 # Single TF Command
 ```bash
-terraform apply -auto-approve
+terraform apply -auto-approve -var="project_id=my-project-name" -var="vpc_name=my-vpc-name" -var="region=us-central1"
 terraform output -json route_table > route_table.json
 
 
