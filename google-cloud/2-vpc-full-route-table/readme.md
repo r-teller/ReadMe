@@ -32,3 +32,4 @@ terraform output -json route_table > route_table.json
 
 ## You can use a site like https://konklone.io/json/ to convert the json into a CSV for sorting and filtering
 ```
+<img src="./images/example_output.png"  width="50%" height="50%" />
