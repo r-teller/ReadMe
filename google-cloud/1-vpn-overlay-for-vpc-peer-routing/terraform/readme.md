@@ -8,7 +8,7 @@ On apply the following items will be created
 - Each project will contain a single jump host that can be used to validate routing
 - Firewall rules to allow traffic from IAP to the jump host to allow SSH
 - Full mesh VPC peering between all three VPCs
-- A private GKE cluster with a single premtible node in the Alpha VPC
+- A private GKE cluster with a single preemptible node in the Alpha VPC
 - VPN peering between the Alpha and Bravo VPC
 
 You can delete the VPN peers to better understand behavior when the peering is not established

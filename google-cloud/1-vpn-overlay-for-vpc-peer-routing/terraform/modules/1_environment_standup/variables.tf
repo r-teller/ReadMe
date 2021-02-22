@@ -50,6 +50,6 @@ variable "svcs_subnetwork" {
 
 variable "billing_account" {
     type        = string
-    default     = null#""
+    default     = null
     description = "The alphanumeric ID of the billing account this project belongs to."
 }
