@@ -1,1 +1,6 @@
 *.ignore
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
