@@ -51,7 +51,3 @@ module "gke_cluster" {
     region =  module.project_standup[each.key].region       
     gke_master_net = each.value.gke_master_net
 }
-
-# output "testing" {
-#     value = module.project_standup["i-haz-cloud-alpha"].subnetwork_self_link
-# }
