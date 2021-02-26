@@ -29,12 +29,16 @@ locals {
 }
 
 
-module "project_standup" {
+module "environment_standup" {
     source = "./modules/1_environment_standup"
 
     for_each = var.environments
     environment = each.key
-    org_id = var.organization_id
+    
+    org_id = try(var.organization_id,null)
+    folder_id = try(var.folder_id,null)
+    project_id = try(var.project_id,null)
+
     billing_account = var.billing_account
 
     primary_network = each.value.primary_network

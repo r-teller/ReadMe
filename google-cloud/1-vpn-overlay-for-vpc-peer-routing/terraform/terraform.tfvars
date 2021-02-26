@@ -1,6 +1,9 @@
 # billing_account = "000000-123456-ABCDEF"
 
+## Only one of the following 3 items are required for sucesful deployment
 # organization_id = 1111111111111
+# folder_id  = 1111111111111
+# project_id = 1111111
 
 vpn_peerings = [
     {

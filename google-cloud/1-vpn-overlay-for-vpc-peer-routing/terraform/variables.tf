@@ -7,6 +7,16 @@ variable "organization_id" {
     type = number
     default = null
 }
+
+variable "project_id" {
+    type = string
+    default = null
+}
+
+variable "folder_id" {
+    type = number
+    default = null
+}
 variable "vpn_peerings" {
     default = []
     type = list(object({

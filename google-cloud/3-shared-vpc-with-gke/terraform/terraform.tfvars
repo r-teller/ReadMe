@@ -9,7 +9,7 @@ environments = {
             pods_subnetwork = "10.10.10.0/24"
             svcs_subnetwork = "10.10.20.0/24"
             host_project    = null
-            enabled_apis    = ["compute.googleapis.com","container.googleapis.com"]
+            enabled_apis    = ["compute.googleapis.com"]
             gke_master_net  = null
         },
         "i-haz-cloud-bravo"={
@@ -18,6 +18,6 @@ environments = {
             svcs_subnetwork = null
             host_project    = "i-haz-cloud-alpha"
             gke_master_net  = "10.10.1.0/28"
-            enabled_apis    = ["compute.googleapis.com","container.googleapis.com"]
+            enabled_apis    = ["compute.googleapis.com"]
         }
     }
