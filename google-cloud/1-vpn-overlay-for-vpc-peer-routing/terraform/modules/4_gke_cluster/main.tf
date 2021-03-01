@@ -3,6 +3,10 @@ data "google_compute_zones" "available" {
   region  = var.region
 }
 
+# output "gke" {
+#   value = google_container_cluster.primary.gke
+# }
+
 resource "google_container_cluster" "primary" {
   count = var.gke_master_net != null ? 1 : 0
 
@@ -15,7 +19,7 @@ resource "google_container_cluster" "primary" {
   # node pool and immediately delete it.
   remove_default_node_pool = true
   initial_node_count       = 1
-  network = var.vpc_name
+  network = var.vpc_name.self_link
   subnetwork = var.subnetwork.name
   ip_allocation_policy {
     cluster_secondary_range_name = var.subnetwork.secondary_ip_range[0].range_name
@@ -66,4 +70,15 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
+}
+
+resource "google_compute_network_peering_routes_config" "gke_peering" {
+  count = var.gke_master_net != null ? 1 : 0
+  project = var.project_id
+
+  network = var.vpc_name.name
+  peering = google_container_cluster.primary[0].private_cluster_config[0].peering_name
+
+  import_custom_routes = true
+  export_custom_routes = true
 }

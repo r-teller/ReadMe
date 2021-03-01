@@ -1,6 +1,10 @@
 data "google_client_config" "clent_config" {
 }
 
+# output test {
+#     value = module.gke_cluster["i-haz-cloud-alpha"].gke[0].private_cluster_config[0].peering_name
+# }
+
 data "http" "http_cloudresourcemanager_googleapis_com" {
   url   = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations"
   request_headers = {
@@ -96,6 +100,7 @@ output "environment_standup" {
         project_id: var.project_id != null ? var.project_id : x.project_id,
         folder_id: var.folder_id != null ? var.folder_id : "Undefined",
         vpc_name: x.network.id
+        gke_private_endpoint: module.gke_cluster[x.environment].private_endpoint
     }]: [{ error: "You must specify at least one of the following variables or environment_standup will fail, project_id, organization_id, folder_id"}]
 }
 
@@ -139,7 +144,7 @@ module "gke_cluster" {
     for_each = local.pre_flight_check ? var.environments : {}
 
     environment = each.key
-    vpc_name = module.environment_standup[each.key].network.self_link
+    vpc_name = module.environment_standup[each.key].network
     project_id = module.environment_standup[each.key].project_id
     random_id = module.environment_standup[each.key].id
     subnetwork = module.environment_standup[each.key].subnetwork
