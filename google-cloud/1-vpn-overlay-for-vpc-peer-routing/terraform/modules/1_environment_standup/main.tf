@@ -124,3 +124,29 @@ resource "google_compute_firewall" "firewall_iap_to_all_vms" {
         "35.235.240.0/20",
     ]
 }
+
+## https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall
+resource "google_compute_firewall" "rfc1918_to_all_vms" {
+    name    = "${var.environment}-rfc1918-to-all-vms-${random_id.id.hex}"
+    project = local.project_id
+    network = google_compute_network.network.id
+
+    log_config {
+        metadata = "EXCLUDE_ALL_METADATA"
+    }
+
+    allow {
+        protocol  = "tcp"
+        ports     = [22,443]
+    }
+
+    allow {
+        protocol  = "icmp"
+    }    
+
+    source_ranges = [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+    ]
+}

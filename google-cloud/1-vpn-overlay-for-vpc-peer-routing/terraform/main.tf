@@ -100,7 +100,8 @@ output "environment_standup" {
         project_id: var.project_id != null ? var.project_id : x.project_id,
         folder_id: var.folder_id != null ? var.folder_id : "Undefined",
         vpc_name: x.network.id
-        gke_private_endpoint: module.gke_cluster[x.environment].private_endpoint
+        gke_private_endpoint: module.gke_cluster[x.environment].private_endpoint        
+        jump_host_ip: module.jump_host[x.environment].jump_host_ip
     }]: [{ error: "You must specify at least one of the following variables or environment_standup will fail, project_id, organization_id, folder_id"}]
 }
 
