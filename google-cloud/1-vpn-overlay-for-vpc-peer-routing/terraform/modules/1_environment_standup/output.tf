@@ -1,10 +1,10 @@
-output "network_self_link" {
-  description = "Network self link"
-  value = google_compute_network.network.self_link
+output "network" {
+  description = "Network Object"
+  value = google_compute_network.network
 }
 
-output "subnetwork_self_link" {
-    description = "Subnetwork Self Link"
+output "subnetwork" {
+    description = "Subnetwork Object"
     value = google_compute_subnetwork.subnetwork
 }
 

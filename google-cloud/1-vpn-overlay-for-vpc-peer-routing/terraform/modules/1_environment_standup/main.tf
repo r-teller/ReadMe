@@ -4,7 +4,7 @@ resource "random_id" "id" {
 }
 
 locals {
-    project_id = var.project_id != null ? var.project_id : try(google_project.folder_project_id[0].project_id,google_project.org_project_id[0].project_id)
+    project_id = var.project_id != null ? var.project_id : try(google_project.folder_project_id[0].project_id, google_project.org_project_id[0].project_id)
     
     pods_subnetwork_name    = "${var.environment}-subnetwork-secondary-pods-${random_id.id.hex}"
     svcs_subnetwork_name    = "${var.environment}-subnetwork-secondary-svcs-${random_id.id.hex}"
@@ -28,11 +28,11 @@ resource "google_project" "folder_project_id" {
     ### Only create a new project if the project_id is not specified and folder_id is specified
     count   = (var.project_id == null && var.folder_id != null) ? 1 : 0
 
-    name                  = "${var.environment}-proj-${random_id.id.hex}"
-    project_id            = "${var.environment}-proj-${random_id.id.hex}"
-    folder_id             = var.folder_id
-
-    auto_create_network   = false
+    name                = "${var.environment}-proj-${random_id.id.hex}"
+    project_id          = "${var.environment}-proj-${random_id.id.hex}"
+    folder_id           = var.folder_id
+    billing_account     = var.billing_account
+    auto_create_network = false
 }
 
 ## https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_project_service
@@ -51,15 +51,17 @@ resource "google_project_service" "gke" {
 ## https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network
 resource "google_compute_network" "network" {
     name                      = "${var.environment}-network-${random_id.id.hex}"
-    project                   = var.project_id != null ? var.project_id : local.project_id
+    project                   = local.project_id
 
     auto_create_subnetworks   = false
+
+    depends_on = [ google_project_service.gce ]
 }
 
 ## https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork
 resource "google_compute_subnetwork" "subnetwork" {
     name            = "${var.environment}-subnetwork-${random_id.id.hex}"
-    project         = var.project_id != null ? var.project_id : local.project_id
+    project         = local.project_id
 
     ip_cidr_range   = var.primary_network
     region          = var.region
@@ -85,7 +87,7 @@ resource "google_compute_router" "router_nat" {
     count   = var.enable_cloud_nat ? 1 : 0
 
     name    = "${var.environment}-router-nat-${random_id.id.hex}"
-    project = var.project_id != null ? var.project_id : local.project_id
+    project = local.project_id
     network = google_compute_network.network.id
     region  = var.region
 }
@@ -96,7 +98,7 @@ resource "google_compute_router_nat" "nat" {
     count   = var.enable_cloud_nat ? 1 : 0
 
     name                                = "${var.environment}-nat-${random_id.id.hex}"
-    project                             = var.project_id != null ? var.project_id : local.project_id
+    project                             = local.project_id
     router                              = google_compute_router.router_nat[0].name
     region                              = var.region
     nat_ip_allocate_option              = "AUTO_ONLY"
@@ -106,7 +108,7 @@ resource "google_compute_router_nat" "nat" {
 ## https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall
 resource "google_compute_firewall" "firewall_iap_to_all_vms" {
     name    = "${var.environment}-firewall-iap-to-all-vms-${random_id.id.hex}"
-    project = var.project_id != null ? var.project_id : local.project_id
+    project = local.project_id
     network = google_compute_network.network.id
 
     log_config {

@@ -33,3 +33,20 @@ gcloud asset search-all-resources | grep "networkIP: $C_CLASS" | wc -l
 - ranges for Cloud SQL and Web servers
     - https://cloud.google.com/composer/docs/how-to/managing/configuring-private-ip#defaults
 
+##
+
+```bash
+gcloud config set proxy/type http
+gcloud config set proxy/address 127.0.0.1
+gcloud config set proxy/port 8888
+gcloud config set auth/disable_ssl_validation  True
+
+gcloud config unset proxy/type
+gcloud config unset proxy/address
+gcloud config unset proxy/port
+gcloud config set auth/disable_ssl_validation  False
+```
+
+```ps1
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+```
