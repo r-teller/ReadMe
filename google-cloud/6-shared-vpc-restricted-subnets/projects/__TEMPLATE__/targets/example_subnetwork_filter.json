@@ -1,0 +1,12 @@
+[
+    {
+        "folder_ids": [3333333333],
+        "project_ids": [],
+        "subnet_match": {
+            "subnetwork": {
+                "regex": "us-east.+qa.+"
+            }
+        },
+        "subnet_list": [ ]
+    }
+]

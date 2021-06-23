@@ -1,0 +1,12 @@
+[
+    {
+        "folder_ids": [1111111111],
+        "project_ids": [],
+        "subnet_match": {
+            "network": {
+                "regex": "example-vpc-network"
+            }
+        },
+        "subnet_list": [ ]
+    }
+]

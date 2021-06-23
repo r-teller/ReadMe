@@ -1,9 +1,6 @@
 data "google_client_config" "clent_config" {
 }
 
-# output test {
-#     value = module.gke_cluster["i-haz-cloud-alpha"].gke[0].private_cluster_config[0].peering_name
-# }
 
 data "http" "http_cloudresourcemanager_googleapis_com" {
   url   = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations"
@@ -90,6 +87,10 @@ locals {
 
 output "pre_flight_status" {
     value = local.pre_flight_status
+}
+
+output "google_container_cluster" {
+    value = module.gke_cluster
 }
 
 output "environment_standup" {

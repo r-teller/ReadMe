@@ -1,0 +1,12 @@
+[
+    {
+        "folder_ids": [2222222222],
+        "project_ids": [],
+        "subnet_match": {
+            "region": {
+                "regex": "us-(east|central)"
+            }
+        },
+        "subnet_list": [ ]
+    }
+]

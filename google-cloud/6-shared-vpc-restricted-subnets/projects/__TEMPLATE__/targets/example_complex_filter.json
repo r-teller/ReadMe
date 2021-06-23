@@ -1,0 +1,20 @@
+[
+    {
+        "folder_ids": [],
+        "project_ids": ["example-service-project-id"],
+        "subnet_match": {
+            "subnetwork": {
+                "regex": "dev"
+            },
+            "region": {
+                "regex": "us-east"
+            },
+            "network": {
+                "regex": "example-vpc-network"
+            }
+        },
+        "subnet_list": [
+            "projects/demo-host-project/regions/us-east1/subnetworks/demo-subnetwork-abc"
+         ]
+    }
+]
