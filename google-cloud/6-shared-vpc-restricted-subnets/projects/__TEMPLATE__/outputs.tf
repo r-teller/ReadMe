@@ -4,8 +4,8 @@
 # }
 
 output "restricted_folder_id_subnetworks" {
-    value = module.restrict_subnetworks.*.restricted_folder_id_subnetworks
+    value = module.restricted_subnetworks.*.restricted_folder_id_subnetworks
 }
 output "restricted_project_id_subnetworks" {
-    value = module.restrict_subnetworks.*.restricted_project_id_subnetworks
+    value = module.restricted_subnetworks.*.restricted_project_id_subnetworks
 }
