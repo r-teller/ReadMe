@@ -17,6 +17,7 @@ Import-Module ./GCPPowerTools.psm1
 Get-Command -Module GCPPowerTools # List available commands imported from module
 New-GCPSession # leverages auth in current shell and sets up some global variables 
 Get-ComputeSubnetworkUtilization 
+```
 
 ## Networking Stuff
 ### Discovery Current Subnetwork Utilziation within your Organization
