@@ -1,0 +1,6 @@
+# Ignore our workspace and it's artifacts
+Workspaces/
+testing/
+/TEST
+
+**/ignore/*
