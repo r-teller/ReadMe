@@ -35,7 +35,8 @@ class Subnetwork {
     [IpAddress_v4[]] $instances = @()
     [IpAddress_v4[]] $forwardingRules = @()
     [IpAddress_v4[]] $otherAddresses = @()
-    $utilization = @{}
+    [string] $utilization = "0.0%"
+    $totalUtilization = @{}
 
     CalculateUtilization(){
         $instanceCount = $this.instances.count
@@ -44,12 +45,10 @@ class Subnetwork {
 
         $hostsMax = [math]::Pow(2,(32 - $this.ipCidrRange.split("/")[1] )) - 2
         $hostsUsed = ($instanceCount + $forwardingRuleCount + $otherAddressCount) +4
-        $hostsPercentage = ($hostsUsed / $hostsMax).ToString("P")
-
-        $this.utilization = @{
+        $this.utilization =  ($hostsUsed / $hostsMax).ToString("P")
+        $this.totalUtilization = @{
             hostsMax = $hostsMax
             hostsUsed = $hostsUsed
-            hostsPercentage = $hostsPercentage
             instances = $instanceCount
             forwardingRules = $forwardingRuleCount
             otherAddresses = $otherAddressCount
@@ -169,7 +168,7 @@ function Get-ComputeSubnetworkUtilization {
             $projects[$subnetwork.projectId].networks[$_network.index].subnetworks += $subnetwork            
         }
         
-        foreach ($_address in $ComputeAddresses | Where-Object {$_.addressType -ne "EXTERNAL" -and $_.users -eq $null} ) {
+        foreach ($_address in $ComputeAddresses | Where-Object {$null -eq $_.users -and $_.addressType -ne "EXTERNAL"} ) {
             $ipAddress_v4 = [IpAddress_v4]::new()
             $ipAddress_v4.name = $_address.name
 
@@ -180,7 +179,6 @@ function Get-ComputeSubnetworkUtilization {
             $ipAddress_v4.consumer = "OtherAddress"
 
             $_subnetworkProjectId = $_address.subnetwork.split("/")[6]
-            $_subnetworkId =  $_address.subnetwork.split("/")[-1]
             
             $ipAddress_v4.network =  $projects[$_subnetworkProjectId].networks | Where-Object {$_.subnetworks.name -eq $ipAddress_v4.subnetwork} | ForEach-Object {
                 foreach($_subnetwork in $_.subnetworks) {
