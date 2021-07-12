@@ -5,6 +5,7 @@ Import-Module -Name .\CoreModules\ComputeInstance.psm1
 Import-Module -Name .\CoreModules\ComputeAddresses.psm1
 Import-Module -Name .\CoreModules\ComputeBackendService.psm1
 Import-Module -Name .\CoreModules\ComputeForwardingRule.psm1
+Import-Module -Name .\CoreModules\ComputeNetwork.psm1
 Import-Module -Name .\CoreModules\ComputeSubnetwork.psm1
 Import-Module -Name .\CoreModules\Utils.psm1
 Import-Module -Name .\CoreModules\GCP.psm1

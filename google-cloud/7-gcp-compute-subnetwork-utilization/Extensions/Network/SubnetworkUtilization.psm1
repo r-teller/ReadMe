@@ -8,6 +8,7 @@ Enum SubnetworkPurpose {
     PRIVATE
     INTERNAL_HTTPS_LOAD_BALANCER
     PRIVATE_SERVICE_CONNECTION
+    LEGACY
 }
 
 class IpAddress_v4 {
@@ -127,6 +128,19 @@ function Get-ComputeSubnetworkUtilization {
             }
         }
 
+
+        # Check if $ComputeSubnetworks param was set or if modulue should be called directly
+        if ($ComputeNetworks) {
+            $jobStatus.Add("ComputeNetworks","Ready")
+        } else {
+            $ComputeNetworks = Get-ComputeNetworks
+            if ($ComputeNetworks) {
+                $jobStatus.Add("ComputeNetworks","Ready")
+            } else {                
+                $jobStatus.Add("ComputeNetworks","NotReady")
+            }
+        }
+
         if ($jobStatus.ContainsValue("NotReady")) {
             Write-Host "One of the Artifacts below is not ready yet"
             $jobStatus.GetEnumerator()
@@ -167,7 +181,39 @@ function Get-ComputeSubnetworkUtilization {
             $subnetwork.index = $projects[$subnetwork.projectId].networks[$_network.index].subnetworks.count
             $projects[$subnetwork.projectId].networks[$_network.index].subnetworks += $subnetwork            
         }
-        
+
+        ## Only required for legacy networks
+        foreach ($_network in $ComputeNetworks | Where-Object {$null -ne $_.IPv4Range})  {
+            $subnetwork = [Subnetwork]::new()
+            $subnetwork.name = $_network.name
+            $subnetwork.region = "global"
+            $subnetwork.ipCidrRange = $_network.IPv4Range
+            $subnetwork.network = $_network.selfLink.split("/")[-1]
+            $subnetwork.projectId = $_network.selfLink.split("/")[6]
+            $subnetwork.purpose = "LEGACY"
+
+            if (($projects.ContainsKey($subnetwork.projectId)) -eq $false) {
+                $project = [Project]::new()
+                $project.projectId = $subnetwork.projectId
+                $project.index = $projects.count
+
+                $projects.add($project.projectId,$project)                
+            }
+            
+            $_network = $projects[$subnetwork.projectId].networks | Where-Object {$_.name -eq $subnetwork.network}
+            if (($_network.count) -eq $false) {
+                $network = [Network]::new()
+                $network.name = $subnetwork.network
+                $network.projectId = $subnetwork.projectId
+                $network.index = $projects[$subnetwork.projectId].networks.count
+
+                $_network = $network
+                $projects[$subnetwork.projectId].networks += $network
+            }
+            $subnetwork.index = $projects[$subnetwork.projectId].networks[$_network.index].subnetworks.count
+            $projects[$subnetwork.projectId].networks[$_network.index].subnetworks += $subnetwork            
+        }                
+
         foreach ($_address in $ComputeAddresses | Where-Object {$null -eq $_.users -and $_.addressType -ne "EXTERNAL"} ) {
             $ipAddress_v4 = [IpAddress_v4]::new()
             $ipAddress_v4.name = $_address.name
@@ -199,16 +245,24 @@ function Get-ComputeSubnetworkUtilization {
                 $ipAddress_v4 = [IpAddress_v4]::new()
                 $ipAddress_v4.name = $_instance.name
                 $ipAddress_v4.network = $_interface.network.split("/")[-1]
-                $ipAddress_v4.subnetwork = $_interface.subnetwork.split("/")[-1]
                 $ipAddress_v4.interface = $_interface.name
                 $ipAddress_v4.networkIp = $_interface.networkIP
                 $ipAddress_v4.state =  $_instance.status
                 $ipAddress_v4.zone = $_instance.zone
-                $ipAddress_v4.region = $_interface.subnetwork.split("/")[8]
                 $ipAddress_v4.projectId = $_instance.selfLink.split("/")[6]
                 $ipAddress_v4.consumer = "Instance"
-
-                $_subnetworkProjectId = $_interface.subnetwork.split("/")[6]
+                
+                ## Checks if the interface belongs to a legcay network
+                if ($null -ne $_interface.subnetwork){
+                    $ipAddress_v4.region = $_interface.subnetwork.split("/")[8]
+                    $ipAddress_v4.subnetwork = $_interface.subnetwork.split("/")[-1]
+                    $_subnetworkProjectId = $_interface.subnetwork.split("/")[6]
+                } else {
+                    $ipAddress_v4.region = "global"
+                    $ipAddress_v4.subnetwork = "default"
+                    $_subnetworkProjectId = $_interface.network.split("/")[6]
+                }
+                
                 $_network = $projects[$_subnetworkProjectId].networks | Where-Object {$_.name -eq $ipAddress_v4.network}
                 $_subnetwork = $projects[$_subnetworkProjectId].networks[$_network.index].subnetworks | Where-Object {$_.name -eq $ipAddress_v4.subnetwork -and $_.region -eq $ipAddress_v4.region}
                 $ipAddress_v4.index = $projects[$_subnetworkProjectId].networks[$_network.index].subnetworks[$_subnetwork.index].instances.count

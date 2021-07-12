@@ -25,10 +25,9 @@ Get-ComputeSubnetworkUtilization
 $utilization=Get-ComputeSubnetworkUtilization
 
 ## This snippet will show all Networks where one ore more subnetworks have exceeded 50% utilziation
-$utilization | Where-Object {
-    $_.networks.subnetworks.utilization.hostsPercentage.trim('%') -gt 50
-    } |Select-Object {$_.projectId, $_.networks.subnetworks.utilization.hostsPercentage.trim('%')
-}  
+$utilization.networks.subnetworks | Where-Object {
+    [double]$_.utilization.trim('%') -gt 50
+}
 ```
 
 ### Useful Ref links
